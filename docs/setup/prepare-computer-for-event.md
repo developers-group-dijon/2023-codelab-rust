@@ -2,6 +2,8 @@
 
 Pour préparer votre participation à l'atelier, rien de plus simple : il suffit d'installer Rust sur votre machine et préparer votre environnement de développement.
 
+*Durée : 5min*
+
 ## Installer Rust
 
 ### Pour Windows
