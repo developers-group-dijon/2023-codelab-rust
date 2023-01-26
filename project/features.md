@@ -28,10 +28,10 @@ generate - generates a new password
 - configurer clap pour la CLI (serde)
 - poser les modules :
     - cli_parser: `parse(cli {}) // parse la cli via CLAP`
-    - dispatcher `dispatch() // dispatch les actions de la CLI`
+    - dispatcher `dispatch(cli {]}) // dispatch les actions de la CLI`
     - database `init(), get_all(), get_single(s), add(new_p {}), delete(s) // interface base fichier json`
     - password `hash(s, s), validate_is_strong(s) // gestion des mots de passe`
-    - console_io `write(s), writeln(s), title(s), table(data), ask(type, s) // se charge des I/O consoles`
+    - console_io `write(s), writeln(s), title(s), table([headers], [data]), ask(type, s) // se charge des I/O consoles`
 
 ## Evols possible après codelab
 - connexion avec HaveIBeenPwnd pour lister les mdp dans les leaks
