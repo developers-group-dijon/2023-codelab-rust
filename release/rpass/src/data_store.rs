@@ -10,7 +10,7 @@ use crate::{
     utils::{get_store_file_path, get_store_folder_path},
 };
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 struct StoreModel {
     data: HashMap<String, PasswordStore>,
 }
@@ -45,7 +45,7 @@ pub struct DataStore<State = Locked> {
 
 impl DataStore<Locked> {
     pub fn unlock(self, master_password: &str) -> Result<DataStore<Unlocked>> {
-        if !DataStore::exists()? {
+        if !self.is_initialized()? {
             bail!(DataStoreError::NotFound);
         }
 
@@ -73,10 +73,6 @@ impl DataStore<Locked> {
 
 impl DataStore<Unlocked> {
     pub fn lock(self) -> Result<DataStore<Locked>> {
-        if !DataStore::exists()? {
-            bail!(DataStoreError::NotFound);
-        }
-
         let store_model = StoreModel { data: self.data };
 
         let store_model_content = serde_json::to_string(&store_model)?;
@@ -111,24 +107,23 @@ impl DataStore<Unlocked> {
     }
 
     pub fn destroy(self) -> Result<()> {
-        todo!();
+        fs::remove_file(get_store_file_path()?)?;
+
+        Ok(())
     }
 }
 
 impl DataStore {
-    pub fn new() -> Result<DataStore<Locked>> {
-        Self::initialize()?;
-
-        Ok(Self {
+    pub fn new() -> DataStore<Locked> {
+        Self {
             data: Default::default(),
             state: Default::default(),
             master_password: Default::default(),
-        })
+        }
     }
 
-    pub fn exists() -> Result<bool> {
+    pub fn is_initialized(&self) -> Result<bool> {
         let datastore_path = get_store_file_path()?;
-        println!("{}", datastore_path.as_os_str().to_string_lossy());
 
         let exists = datastore_path.try_exists();
 
@@ -139,7 +134,7 @@ impl DataStore {
         Ok(exists.unwrap())
     }
 
-    fn initialize() -> Result<()> {
+    pub fn initialize(&self, master_password: &str) -> Result<DataStore<Locked>> {
         let store_folder = get_store_folder_path()?;
 
         if !store_folder.exists() {
@@ -152,7 +147,15 @@ impl DataStore {
             fs::write(get_store_file_path()?, "")?
         }
 
-        Ok(())
+        let mock = DataStore {
+            data: Default::default(),
+            state: PhantomData::<Unlocked>,
+            master_password: master_password.into(),
+        };
+
+        let locked = mock.lock()?;
+
+        Ok(locked)
     }
 
     fn load_content(&self) -> Result<String> {

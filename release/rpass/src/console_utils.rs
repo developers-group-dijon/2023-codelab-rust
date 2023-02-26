@@ -200,6 +200,28 @@ impl ConsoleIO {
         self.writeln(&format!("{table}"));
     }
 
+    /// creates a data table with headers with Strings
+    pub fn string_table(&self, headers: Vec<String>, data: Vec<Vec<String>>) {
+        let mut table = Table::new();
+
+        let header_bold = headers
+            .iter()
+            .map(|e| {
+                Cell::new(e)
+                    .add_attribute(Attribute::Bold)
+                    .set_alignment(CellAlignment::Center)
+            })
+            .collect::<Vec<Cell>>();
+
+        table
+            .load_preset(UTF8_FULL)
+            .apply_modifier(UTF8_ROUND_CORNERS)
+            .set_header(header_bold)
+            .add_rows(data);
+
+        self.writeln(&format!("{table}"));
+    }
+
     /// creates a key-value pair display.
     ///
     /// You can use LIST_SEPARATOR to split your listings

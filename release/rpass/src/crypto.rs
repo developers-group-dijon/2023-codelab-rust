@@ -32,7 +32,7 @@ pub fn encrypt(content: &str, password: &str) -> Result<EncryptedMessage> {
     let ciphertext_result = cipher.encrypt(nonce.as_ref().into(), content.as_bytes().as_ref());
 
     if let Err(error) = ciphertext_result {
-        bail!("{error}");
+        bail!("Error while ciphering data : {error}");
     }
 
     let ciphertext = ciphertext_result.unwrap();
@@ -51,9 +51,13 @@ pub fn decrypt(crypted: EncryptedMessage, password: &str) -> Result<String> {
     let key = argon2::hash_raw(password.as_bytes(), &salt, &argon2_config)?;
     let cipher = XChaCha20Poly1305::new(key[..32].as_ref().into());
 
-    let decoded = cipher
-        .decrypt(nonce.as_ref().into(), ciphertext.as_ref())
-        .unwrap();
+    let decoded_result = cipher.decrypt(nonce.as_ref().into(), ciphertext.as_ref());
+
+    if let Err(error) = decoded_result {
+        bail!("Error while deciphering data : {error}");
+    }
+
+    let decoded = decoded_result.unwrap();
 
     Ok(String::from_utf8(decoded).unwrap())
 }

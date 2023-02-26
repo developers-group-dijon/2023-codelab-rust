@@ -50,4 +50,10 @@ pub enum Command {
         #[arg(short, long)]
         master_password: Option<String>,
     },
+    /// Destroys the DataStore
+    Destroy {
+        /// master password to unlock the DataStore
+        #[arg(short, long)]
+        master_password: Option<String>,
+    },
 }
