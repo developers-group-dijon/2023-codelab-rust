@@ -1,5 +1,8 @@
+use std::process::exit;
+
 use anyhow::Result;
-use data_store::DataStore;
+use clap::Parser;
+use cli::Cli;
 pub mod cli;
 pub mod console_utils;
 pub mod constants;
@@ -9,7 +12,5 @@ pub mod middleware;
 pub mod utils;
 
 fn main() -> Result<()> {
-    let data_store = DataStore::new()?;
-
-    Ok(())
+    middleware::handle(&Cli::parse())
 }
