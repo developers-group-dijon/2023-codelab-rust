@@ -3,7 +3,7 @@ use std::collections::BTreeMap;
 use comfy_table::{
     modifiers::UTF8_ROUND_CORNERS,
     presets::{NOTHING, UTF8_FULL},
-    Attribute, Cell, CellAlignment, Table,
+    Attribute, Cell, CellAlignment, Row, Table,
 };
 use console::{style, Emoji, Term};
 use indicatif::ProgressBar;
@@ -213,11 +213,16 @@ impl ConsoleIO {
             })
             .collect::<Vec<Cell>>();
 
+        let rows = data
+            .iter()
+            .map(|data| Row::from(data))
+            .collect::<Vec<Row>>();
+
         table
             .load_preset(UTF8_FULL)
             .apply_modifier(UTF8_ROUND_CORNERS)
             .set_header(header_bold)
-            .add_rows(data);
+            .add_rows(rows);
 
         self.writeln(&format!("{table}"));
     }

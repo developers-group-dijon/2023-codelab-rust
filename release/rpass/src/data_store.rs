@@ -19,11 +19,16 @@ struct StoreModel {
 pub enum DataStoreError {
     #[error("Datastore not found in the system")]
     NotFound,
+    #[error("Key {0} not found in the datastore")]
+    KeyNotFound(String),
+    #[error("Key {0} already exists in the datastore")]
+    KeyAlreadyExists(String),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PasswordStore {
     pub label: String,
+    pub login: Option<String>,
     pub password: String,
     pub url: Option<String>,
     pub comment: Option<String>,
@@ -36,7 +41,7 @@ pub struct Locked;
 #[derive(Default)]
 pub struct Unlocked;
 
-#[derive(Default, Debug, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone)]
 pub struct DataStore<State = Locked> {
     data: HashMap<String, PasswordStore>,
     state: PhantomData<State>,
@@ -90,16 +95,34 @@ impl DataStore<Unlocked> {
         Ok(DataStore::default())
     }
 
-    pub fn get(&self, key: &str) -> Result<PasswordStore> {
-        todo!();
+    pub fn get(&self, key: &str) -> Result<&PasswordStore> {
+        if !self.data.contains_key(key) {
+            bail!(DataStoreError::KeyNotFound(key.to_string()));
+        }
+
+        Ok(self.data.get(key).unwrap())
     }
 
     pub fn insert(&mut self, new_store: &PasswordStore) -> Result<()> {
-        todo!();
+        let label = new_store.label.clone();
+
+        if self.data.contains_key(&label) {
+            bail!(DataStoreError::KeyAlreadyExists(label.to_string()));
+        }
+
+        self.data.insert(label, new_store.clone().to_owned());
+
+        Ok(())
     }
 
     pub fn delete(&mut self, key: &str) -> Result<()> {
-        todo!();
+        if !self.data.contains_key(key) {
+            bail!(DataStoreError::KeyNotFound(key.to_string()));
+        }
+
+        self.data.remove(key);
+
+        Ok(())
     }
 
     pub fn data(&self) -> HashMap<String, PasswordStore> {
