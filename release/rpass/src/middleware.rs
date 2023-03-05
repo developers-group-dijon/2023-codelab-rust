@@ -29,13 +29,11 @@ pub enum HandlingError {
 }
 
 pub fn handle(cli: &Cli) -> Result<()> {
-    let master_password: String;
-
-    if cli.master_password.is_none() {
-        master_password = require_master_password()?;
+    let master_password = if cli.master_password.is_none() {
+        require_master_password()?
     } else {
-        master_password = cli.master_password.as_ref().unwrap().to_owned();
-    }
+        cli.master_password.as_ref().unwrap().to_owned()
+    };
 
     let data_store = DataStore::new();
 
@@ -146,10 +144,14 @@ fn add(data_store: DataStore, master_password: &str) -> Result<DataStore<Unlocke
 
     let data = PasswordStore {
         label: label.clone(),
-        login: if "" == login { None } else { Some(login) },
+        login: if login.is_empty() { None } else { Some(login) },
         password,
-        url: if "" == url { None } else { Some(url) },
-        comment: if "" == comment { None } else { Some(comment) },
+        url: if url.is_empty() { None } else { Some(url) },
+        comment: if comment.is_empty() {
+            None
+        } else {
+            Some(comment)
+        },
         creation_date: Utc::now(),
     };
 
@@ -223,9 +225,9 @@ fn require_master_password() -> Result<String> {
 }
 
 fn sanitize_none_option_string(opt: Option<String>) -> String {
-    return if opt.is_none() {
-        "".to_string()
+    if let Some(value) = opt {
+        value
     } else {
-        opt.unwrap()
-    };
+        "".into()
+    }
 }

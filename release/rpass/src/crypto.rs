@@ -22,8 +22,8 @@ pub fn encrypt(content: &str, password: &str) -> Result<EncryptedMessage> {
     OsRng.fill_bytes(&mut salt);
     OsRng.fill_bytes(&mut nonce);
 
-    message.salt = salt.clone();
-    message.nonce = nonce.clone();
+    message.salt = salt;
+    message.nonce = nonce;
 
     let key = argon2::hash_raw(password.as_bytes(), &salt, &argon2_config)?;
 
@@ -46,7 +46,7 @@ pub fn decrypt(crypted: EncryptedMessage, password: &str) -> Result<String> {
 
     let salt = crypted.salt;
     let nonce = crypted.nonce;
-    let ciphertext = crypted.message.clone();
+    let ciphertext = crypted.message;
 
     let key = argon2::hash_raw(password.as_bytes(), &salt, &argon2_config)?;
     let cipher = XChaCha20Poly1305::new(key[..32].as_ref().into());
@@ -63,12 +63,12 @@ pub fn decrypt(crypted: EncryptedMessage, password: &str) -> Result<String> {
 }
 
 fn argon2_config<'a>() -> argon2::Config<'a> {
-    return argon2::Config {
+    argon2::Config {
         variant: argon2::Variant::Argon2id,
         hash_length: 32,
         lanes: 8,
         mem_cost: 16 * 1024,
         time_cost: 8,
         ..Default::default()
-    };
+    }
 }

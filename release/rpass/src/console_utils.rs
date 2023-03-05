@@ -213,10 +213,7 @@ impl ConsoleIO {
             })
             .collect::<Vec<Cell>>();
 
-        let rows = data
-            .iter()
-            .map(|data| Row::from(data))
-            .collect::<Vec<Row>>();
+        let rows = data.iter().map(Row::from).collect::<Vec<Row>>();
 
         table
             .load_preset(UTF8_FULL)

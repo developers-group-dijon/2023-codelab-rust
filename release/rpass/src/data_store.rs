@@ -107,10 +107,10 @@ impl DataStore<Unlocked> {
         let label = new_store.label.clone();
 
         if self.data.contains_key(&label) {
-            bail!(DataStoreError::KeyAlreadyExists(label.to_string()));
+            bail!(DataStoreError::KeyAlreadyExists(label));
         }
 
-        self.data.insert(label, new_store.clone().to_owned());
+        self.data.insert(label, new_store.clone());
 
         Ok(())
     }
