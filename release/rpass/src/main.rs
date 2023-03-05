@@ -8,6 +8,7 @@ pub mod constants;
 pub mod crypto;
 pub mod data_store;
 pub mod middleware;
+pub mod passwords;
 pub mod utils;
 
 fn main() {

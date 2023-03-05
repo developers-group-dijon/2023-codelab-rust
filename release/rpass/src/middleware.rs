@@ -2,13 +2,13 @@ use crate::{
     cli::{Cli, Command},
     console_utils::ConsoleIO,
     data_store::{DataStore, PasswordStore, Unlocked},
+    passwords,
 };
 use anyhow::{bail, Result};
 use chrono::{DateTime, Local, Utc};
-use console::style;
 use inquire::{required, PasswordDisplayMode};
+use itertools::Itertools;
 use thiserror::Error;
-use zxcvbn::zxcvbn;
 
 #[derive(Debug, Error)]
 pub enum HandlingError {
@@ -18,6 +18,14 @@ pub enum HandlingError {
     NotInitialized,
     #[error("Datastore destroy aborted")]
     DestroyAborted,
+    #[error("Password addition aborted")]
+    AdditionAborted,
+    #[error("Password deletion aborted")]
+    DeleteAborted,
+    #[error("Key \"{0}\" already exists in datastore")]
+    KeyAlreadyExists(String),
+    #[error("Key \"{0}\" is not in datastore")]
+    KeyNotFound(String),
 }
 
 pub fn handle(cli: &Cli) -> Result<()> {
@@ -63,20 +71,20 @@ fn list(data_store: DataStore, master_password: &str) -> Result<DataStore<Unlock
 
     let mut lines: Vec<Vec<String>> = vec![];
 
-    for (_, data) in opened.data() {
-        let url = sanitize_none_option_string(data.url);
-        let login = sanitize_none_option_string(data.login);
-        let comment = sanitize_none_option_string(data.comment);
+    for (_, data) in opened.data().iter().sorted_by_key(|x| x.0) {
+        let url = sanitize_none_option_string(data.url.clone());
+        let login = sanitize_none_option_string(data.login.clone());
+        let comment = sanitize_none_option_string(data.comment.clone());
 
         let local_time: DateTime<Local> = DateTime::from(data.creation_date);
 
         lines.push(vec![
-            data.label,
+            data.label.clone(),
             url,
             login,
             comment,
             local_time.format("%v %X").to_string(),
-            format_password_strength(&data.password)?,
+            passwords::format_password_strength(&data.password)?,
         ]);
     }
 
@@ -108,6 +116,10 @@ fn add(data_store: DataStore, master_password: &str) -> Result<DataStore<Unlocke
         .with_validator(required!())
         .prompt()?;
 
+    if opened.get(&label).is_ok() {
+        bail!(HandlingError::KeyAlreadyExists(label));
+    }
+
     let url = console.ask_question_default("URL for this password:", "");
     let login = console.ask_question_default("Login for this password:", "");
 
@@ -116,6 +128,19 @@ fn add(data_store: DataStore, master_password: &str) -> Result<DataStore<Unlocke
         .with_display_mode(PasswordDisplayMode::Masked)
         .with_validator(required!())
         .prompt()?;
+
+    let password_strength_label = passwords::format_password_strength(&password)?;
+    console.writeln(&format!("Password strength: {password_strength_label}"));
+
+    if passwords::get_password_strength(&password)? < 3 {
+        let confirmed = console.ask_confirm(
+            "Your password seems to be not safe enough, are you sure you want to store it as it is",
+        );
+
+        if !confirmed {
+            bail!(HandlingError::AdditionAborted);
+        }
+    }
 
     let comment = console.ask_question_default("Comment for this password:", "");
 
@@ -130,25 +155,56 @@ fn add(data_store: DataStore, master_password: &str) -> Result<DataStore<Unlocke
 
     opened.insert(&data)?;
 
-    console.success(&format!("Password {label} added !"));
+    console.success(&format!("Password \"{label}\" added !"));
 
     Ok(opened)
 }
 
 fn delete(data_store: DataStore, name: &str, master_password: &str) -> Result<DataStore<Unlocked>> {
-    let opened = data_store.unlock(master_password)?;
+    let console = ConsoleIO::new();
+
+    let mut opened = data_store.unlock(master_password)?;
+
+    if opened.get(name).is_err() {
+        bail!(HandlingError::KeyNotFound(name.into()));
+    }
+
+    let confirmed =
+        console.ask_confirm(&format!("Are you sure you want to delete entry \"{name}\""));
+
+    if !confirmed {
+        bail!(HandlingError::DeleteAborted);
+    }
+
+    opened.delete(name)?;
+
+    console.success(&format!("Entry \"{name}\" deleted !"));
 
     Ok(opened)
 }
 
 fn dump(data_store: DataStore, name: &str, master_password: &str) -> Result<DataStore<Unlocked>> {
+    let console = ConsoleIO::new();
+
     let opened = data_store.unlock(master_password)?;
+
+    if let Ok(data) = opened.get(name) {
+        console.write(&data.password);
+    } else {
+        bail!(HandlingError::KeyNotFound(name.into()));
+    }
 
     Ok(opened)
 }
 
 fn generate(data_store: DataStore, master_password: &str) -> Result<DataStore<Unlocked>> {
+    let console = ConsoleIO::new();
+
     let opened = data_store.unlock(master_password)?;
+
+    let generated = passwords::generate(24)?;
+
+    console.success(&format!("Password generated: {generated}"));
 
     Ok(opened)
 }
@@ -172,17 +228,4 @@ fn sanitize_none_option_string(opt: Option<String>) -> String {
     } else {
         opt.unwrap()
     };
-}
-
-fn format_password_strength(password: &str) -> Result<String> {
-    let estimate = zxcvbn(password, &[])?;
-
-    Ok(match estimate.score() {
-        0 => "0/4 - You must change it !".to_string(),
-        1 => "1/4 - Nowhere near safe !".to_string(),
-        2 => "2/4 - Not safe !".to_string(),
-        3 => "3/4 - Safe".to_string(),
-        4 => "4/4 - Ultra safe".to_string(),
-        _ => bail!("Error while parsing password score !"),
-    })
 }
