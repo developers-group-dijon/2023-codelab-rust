@@ -11,11 +11,7 @@ fn main() {
     while !found {
         println!("Quel est le juste prix ?");
 
-        let mut guess = String::new();
-
-        io::stdin()
-            .read_line(&mut guess)
-            .expect("Erreur: ligne non lue.");
+        let guess = get_input_from_user();
 
         if let Ok(num) = guess.trim().parse::<u32>() {
             print!("Vous proposez : {num}");
@@ -29,7 +25,7 @@ fn main() {
                 }
             }
         };
-    };
+    }
 }
 
 /// Generates a random u32 number between min and max included.
@@ -37,4 +33,15 @@ fn generate_random_number_between(min: u32, max: u32) -> u32 {
     use rand::Rng;
 
     rand::thread_rng().gen_range(min..=max)
+}
+
+/// lit l'entrée standard
+fn get_input_from_user() -> String {
+    let mut input = String::new();
+
+    io::stdin()
+        .read_line(&mut input)
+        .expect("Erreur: ligne non lue.");
+
+    input
 }
