@@ -25,7 +25,9 @@ fn main() {
                     found = true;
                 }
             }
-        };
+        } else {
+            println!("ERREUR: saisie invalide !");
+        }
     }
 }
 
