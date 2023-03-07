@@ -1,6 +1,7 @@
 use std::cmp::Ordering;
 use std::io;
 
+// release
 fn main() {
     println!("== Le juste prix ==");
 
