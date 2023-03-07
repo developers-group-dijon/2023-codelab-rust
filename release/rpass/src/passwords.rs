@@ -3,6 +3,7 @@ use passwords::PasswordGenerator;
 use thiserror::Error;
 use zxcvbn::zxcvbn;
 
+/// possible errors upon password generation.
 #[derive(Debug, Error)]
 pub enum PasswordGenerationError {
     #[error("Length must be at least 8.")]
@@ -11,6 +12,10 @@ pub enum PasswordGenerationError {
     PasswordGenerationError(String),
 }
 
+/// Generates a safe password with the given length.
+///
+/// the return will be a `PasswordGenerationError::LengthTooLow`
+/// error if the length requested is under 8.
 pub fn generate(len: usize) -> Result<String> {
     if len < 8 {
         bail!(PasswordGenerationError::LengthTooLow);
@@ -38,6 +43,9 @@ pub fn generate(len: usize) -> Result<String> {
     Ok(generated.unwrap())
 }
 
+/// Outputs a String representing a password's strength (measured by ZXCVBN).
+///
+/// This will return an error if the generated score is invalid.
 pub fn format_password_strength(password: &str) -> Result<String> {
     let estimate = get_password_strength(password)?;
 
@@ -51,6 +59,9 @@ pub fn format_password_strength(password: &str) -> Result<String> {
     })
 }
 
+/// Generates a strengh score for a given password against ZXCVBN.
+///
+/// This will return an error in any case of issue with ZXCVBN.
 pub fn get_password_strength(password: &str) -> Result<u8> {
     let estimate = zxcvbn(password, &[])?;
 
