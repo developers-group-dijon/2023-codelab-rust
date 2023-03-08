@@ -96,9 +96,9 @@ rustup component add clippy
 En suite, vous devez spécifier à VSCode d'utiliser Clippy au lieu du linter par défaut, pour cela :
 
 1. Allez dans `file` > `preference` > `settings`.
-2. Recherchez l'entrée `Rust-analyzer › Check On Save: Command`
+2. Recherchez l'entrée `Rust analyzer › Check Command`
 3. Remplacez la valeur par `clippy`
-4. Vérifiez bien que la valeur `Rust-analyzer › Check On Save: Enable` est bien cochée.
+4. Vérifiez bien que la valeur `Rust analyzer › Check On Save: Enable` est bien cochée.
 5. Quittez la fenêtre de settings.
 
 Voilà, maintenant Clippy vous accompagnera pendant vos développements, et tout votre environnement est prêt pour l'atelier.
