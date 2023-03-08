@@ -67,3 +67,23 @@ pub fn get_password_strength(password: &str) -> Result<u8> {
 
     Ok(estimate.score())
 }
+
+// unit tests for this module.
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// test function for bad passwords
+    #[test]
+    fn assert_bad_password() {
+        assert_eq!(0, get_password_strength("test").unwrap());
+    }
+
+    /// test function for strong passwords
+    #[test]
+    fn assert_strong_password() {
+        let generated = generate(24).unwrap();
+
+        assert_eq!(4, get_password_strength(&generated).unwrap());
+    }
+}

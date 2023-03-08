@@ -38,6 +38,30 @@ pub enum HandlingError {
 pub fn handle(cli: &Cli) -> Result<()> {
     todo!();
 
+    // valider que le master password est bien dans les paramètres de la commande.
+    // Attention, c'est une option, donc soit Ok(value) soit None (il y a des fonction is_...)
+    //
+    // Si ce n'est pas le cas, utiliser la fonction require_master_password().
+    // Cette fonction renvoie un Result, mais on va transmettre ces erreurs à main ;)
+
+    // construire une instance de DataStore (regarder les méthodes disponibles de DataStore)
+
+    // Avant d'utiliser le DataStore, il faudrait valider qu'il est initialisé : regarder les méthodes
+    // disponibles sur DataStore ;)
+    //
+    // Si le datastore n'est pas initialisé, et que l'argument commande de cli n'est pas de type Commande::Init
+    // il faut renvoyer une erreur HandlingError::NotInitialized.
+    //
+    // Vous pouvez regarder si une valeur est du type d'un enum avec la macro matches!(val, type).
+
+    // Utilisez la structure match pour couvrir tout les cas de cli.command, et appelez les bonnes fonctions
+    // de ce module en conséquence (ex: Command::List => list(...)).
+    //
+    // Chacune de ces fonctions renvoie une instance du DataStore en état Unlocked, récupérer cette instance.
+
+    // reverrouiller le datastore
+
+    // retour d'un Result vide après exécution du code métier.
     Ok(())
 }
 

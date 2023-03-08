@@ -2,5 +2,25 @@
     "editor.defaultFormatter": "rust-lang.rust-analyzer",
     "editor.formatOnSave": true,
     "editor.fontFamily": "Fira Code",
-    "editor.fontLigatures": true
+    "editor.fontLigatures": true,
+    "workbench.colorCustomizations": {
+        "activityBar.activeBackground": "#00b3b3",
+        "activityBar.background": "#00b3b3",
+        "activityBar.foreground": "#e7e7e7",
+        "activityBar.inactiveForeground": "#e7e7e799",
+        "activityBarBadge.background": "#bf00bf",
+        "activityBarBadge.foreground": "#e7e7e7",
+        "commandCenter.border": "#e7e7e799",
+        "sash.hoverBorder": "#00b3b3",
+        "statusBar.background": "#008080",
+        "statusBar.foreground": "#e7e7e7",
+        "statusBarItem.hoverBackground": "#00b3b3",
+        "statusBarItem.remoteBackground": "#008080",
+        "statusBarItem.remoteForeground": "#e7e7e7",
+        "titleBar.activeBackground": "#008080",
+        "titleBar.activeForeground": "#e7e7e7",
+        "titleBar.inactiveBackground": "#00808099",
+        "titleBar.inactiveForeground": "#e7e7e799"
+    },
+    "peacock.color": "teal"
 }
