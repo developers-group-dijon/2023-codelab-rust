@@ -67,6 +67,10 @@ pub fn handle(cli: &Cli) -> Result<()> {
 /// - the initialization fails.
 /// - the datastore cannot be unlocked.
 fn init(data_store: DataStore, master_password: &str) -> Result<DataStore<Unlocked>> {
+    if data_store.is_initialized()? {
+        bail!(HandlingError::AlreadyInitialized);
+    }
+
     data_store.initialize(master_password)?;
     let opened = data_store.unlock(master_password)?;
 
