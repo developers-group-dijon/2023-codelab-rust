@@ -6,8 +6,8 @@ Vous pourrez trouver dans ce dépôt :
 
 * 🧰 De quoi préparer votre PC/Mac pour l'atelier 🡆 [Préparer son PC/Mac pour l'atelier](/docs/setup/prepare-computer-for-event.md)
 * 📋 Les différentes parties de l'atelier 🡆
-    * Le starter lab (support de l'évènement effectué le 23 mars) : [Starter lab (powerpoint)](./docs/starter%20lab/Codelab%20-%20rust%20-%2003-2023.pptx)
-    * Le home lab (atelier à faire soi-même) : [Home lab (powerpoint)](./docs/home%20lab/HomeLAB%20-%20rust%20-%2003-2023.pptx)
+    * Le starter lab (support de l'évènement effectué le 23 mars) : [Starter lab (PDF)](./docs/starter%20lab/StarterLab%20-%20rust%20-%2003-2023.pdf)
+    * Le home lab (atelier à faire soi-même) : [Home lab (PDF)](./docs/home%20lab/HomeLAB%20-%20rust%20-%2003-2023.pdf)
 * 💾 Une version finalisée et documentée des applications 🡆 [Release](./release/README.md)
 * 📙 Des ressources complémentaires pour aller plus loin avec Rust 🡆 [Rust, le langage des 10 prochaines années](https://github.com/AdrienGras/presentation-rust-2022)
 
